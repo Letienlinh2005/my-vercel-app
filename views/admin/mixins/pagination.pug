@@ -1,0 +1,17 @@
+mixin pagination(pagination)
+    nav
+        ul.pagination
+            // Hiển thị nút "Trang trước" nếu currentPage > 1
+            if pagination.currentPage > 1
+                li.page-item
+                    button.page-link(buttonPagination = pagination.currentPage - 1) Trang trước
+
+            // Hiển thị các số trang
+            - for (let i = 1; i <= pagination.totalPages; i++)
+                li(class=`page-item ${i === pagination.currentPage ? 'active' : ''}`)
+                    button.page-link(buttonPagination=i)= i
+
+            // Hiển thị nút "Kế tiếp" nếu currentPage < totalPages
+            if pagination.currentPage < pagination.totalPages
+                li.page-item
+                    button.page-link(buttonPagination=pagination.currentPage + 1) Kế tiếp

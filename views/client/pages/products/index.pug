@@ -1,0 +1,11 @@
+extends ../../layouts/default.pug
+block main 
+    h1 Đây là trang sản phẩm
+    each product in products
+        .product 
+            h2= product.title
+            p Giá: #{product.price} VND
+            p Mô tả: #{product.description}
+            if product.thumbnail
+                img(src=product.thumbnail, alt=product.title, class="img-fluid" height="50" width="50")
+            

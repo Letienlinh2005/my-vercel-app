@@ -1,0 +1,13 @@
+block main 
+    h1 Create Product ne
+    form(action=`${prefixAdmin}/products/create`, method='POST')
+        .mb-3
+            label(for='name') Name
+            input(type='text', class='form-control', id='name', name='name', required)
+        .mb-3
+            label(for='price') Price
+            input(type='number', class='form-control', id='price', name='price', required)
+        .mb-3
+            label(for='description') Description
+            textarea(class='form-control', id='description', name='description', rows='3', required)
+        button(type='submit', class='btn btn-primary') Create Product
