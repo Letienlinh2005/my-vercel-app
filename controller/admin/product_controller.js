@@ -14,8 +14,6 @@ module.exports.products = async (req, res) => {
     
     let find = {
       deleted: false
-      // find.title sẽ ở đây
-      // find.status sẽ ở đây
     }
     if(req.query.status) {
       find.status = req.query.status; // Lọc theo trạng thái nếu có
@@ -37,7 +35,20 @@ module.exports.products = async (req, res) => {
       req.query,
       countProducts
     );
-    const products = await Product.find(find).sort({position: "desc"}).limit(objectPagination.limitItems).skip(objectPagination.skip); // Lấy sản phẩm với điều kiện tìm kiếm và phân trang
+
+    // Sort
+    let sort = {
+
+    };
+    if(req.query.sortKey && req.query.sortValue){
+      sort[req.query.sortKey] = req.query.sortValue;
+    }
+    else{
+      sort.position = "desc";
+    }
+    
+    // End Sort
+    const products = await Product.find(find).sort(sort).limit(objectPagination.limitItems).skip(objectPagination.skip); // Lấy sản phẩm với điều kiện tìm kiếm và phân trang
     
     // Render view với dữ liệu sản phẩm
     res.render('admin/pages/products/index', {
