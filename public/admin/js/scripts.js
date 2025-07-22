@@ -44,10 +44,8 @@ if(searchForm){
 
 // Cập nhật tham số lên URL khi nhấn nút phân trang
 const pagination = document.querySelectorAll("[buttonPagination]");
-console.log(pagination);
 if(pagination) {
-    pagination.forEach((button) => {
-        // Thêm sự kiện click cho từng nút phân trang
+    pagination.forEach(button => {
         button.addEventListener("click", function() {
             let url = new URL(window.location.href); // Lấy URL hiện tại
             const page = this.getAttribute("buttonPagination"); // Lấy giá trị của thuộc tính data-page
@@ -60,4 +58,102 @@ if(pagination) {
         });
     });
 }
+// Checkbox Multi
+const checkBoxMulti = document.querySelector("[checkbox-multi]");
+if(checkBoxMulti){
+    const inputCheckAll = checkBoxMulti.querySelector("input[name='checkall']"); 
+    const inputId = checkBoxMulti.querySelectorAll("input[name='id']");
 
+    inputCheckAll.addEventListener("click", () => {
+        if(inputCheckAll.checked){
+            inputId.forEach(input=>{
+                input.checked = true;
+            })
+        }
+        else{
+            inputId.forEach(input => {
+                input.checked = false;
+            })
+        }
+    });
+
+    inputId.forEach(input => {
+        input.addEventListener("click", () => {
+            const countChecked = document.querySelectorAll("input[name='id']:checked").length;
+            if(countChecked === inputId.length){
+                inputCheckAll.checked = true;
+            }else{
+                inputCheckAll.checked = false;
+            }
+        })
+    })
+}
+
+// Thay đổi trạng thái sản phẩm
+const formChangeMulti = document.querySelector("[form-change-multi]");
+if(formChangeMulti){
+    formChangeMulti.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const inputsChecked = document.querySelectorAll("input[name='id']:checked");
+
+        const typeChange = e.target.elements.type.value;
+
+        if(typeChange == "delete"){
+            const isConfirm = confirm("Bạn có chắc chắn muốn xoá những sản phẩm này?");
+            if(!isConfirm){
+                return;
+            }
+        }
+        if(inputsChecked.length > 0){
+            let ids = [];
+
+            const inputIds = document.querySelector("input[name='ids']");
+
+            inputsChecked.forEach(input => {
+                const id = input.value;
+                if(typeChange == "change-position"){
+                    
+                    const position = input.closest("tr").querySelector("input[name='position']").value;
+                    console.log(`${id}-${position}`);
+                }else{
+                    ids.push(id);
+                }
+            });
+            inputIds.value = ids.join(", ");
+            formChangeMulti.submit();
+        }else{
+            alert("Vui lòng chọn ít nhất một sản phẩm!");
+        }
+    })
+}
+
+//showAlert
+const showAlert = document.querySelector("[show-alert]");
+if(showAlert){
+    const time = parseInt(showAlert.getAttribute("data-time"));
+    const close = showAlert.querySelector("[close-alert]");
+    setTimeout(()=>{
+        showAlert.classList.add("alert-hidden");
+    }, time);
+
+    close.addEventListener("click", ()=>{
+        showAlert.classList.add("alert-hidden");
+    })
+}
+
+// Preview ảnh
+const uploadImage = document.querySelector("[upload-image]");
+if (uploadImage) {
+    const uploadImageInput = document.querySelector('[upload-image-input]');
+    const imagePreview = document.querySelector('[upload-image-preview]');
+
+    uploadImageInput.addEventListener("change", (e) => {
+        console.log(e);
+        const file = e.target.files[0];
+        if (file) {
+            const imageUrl = URL.createObjectURL(file);
+            imagePreview.src = imageUrl;
+        }
+    });
+}
