@@ -9,7 +9,6 @@ const systems = require('./config/systems.js');
 const database = require('./config/database.js');
 const routeClient = require('./routes/client/index_route.js');
 const routeAdmin = require('./routes/admin/index_route.js');
-const multer = require('multer');
 require('dotenv').config();
 const port = process.env.PORT;
 
