@@ -1,0 +1,38 @@
+mixin tableTree(items, level = 1)
+    each item, index in items
+        - const prefix = Array(level + 1).join('-- ')
+        tr
+            td 
+                input(type="checkbox" name="id" value=item.id)
+            td #{item.index}
+            td #{prefix} #{item.title}
+            - console.log('Level:', level, 'Item:', item.title)
+            td 
+                img(src=item.thumbnail, alt=item.title, class="img-fluid", height="80", width="80")
+            td!= item.description
+            td
+                input(type="number" value=item.position style="width: 60px" min="1" name="position")
+            td 
+                if item.status === 'active'
+                    a.badge.bg-success(
+                        href="javascript:;"
+                        data-status="active"
+                        button-change-status
+                        data-id=item.id 
+                    ) Hoạt động
+                else
+                    a.badge.bg-danger(
+                        href="javascript:;"
+                        data-status="inactive"
+                        button-change-status
+                        data-id=item.id
+                    ) Dừng hoạt động
+            td 
+                a(href=`${prefixAdmin}/products-category/detail/${item.id}/`, class='btn btn-secondary btn-sm') Chi tiết
+                a(href=`${prefixAdmin}/products-category/edit/${item.id}/`, class='btn btn-warning btn-sm me-1') Sửa
+                a(class='btn btn-danger btn-sm' button-delete data-id=item.id) Xoá
+
+    
+
+        if item.children && item.children.length > 0
+            +tableTree(item.children, level + 1)

@@ -1,10 +1,12 @@
 
 const Product = require('../../models/product_model.js');
+const ProductCategory = require('../../models/product_category_model.js');
 
 const systemConfig = require('../../config/systems.js');
 const filteredStatus = require('../../helpers/filterStatus.js'); 
 const search = require('../../helpers/search.js'); 
 const paginationHelper = require('../../helpers/pagination.js');
+const createTreeHelper = require('../../helpers/createTree');
 
 
 module.exports.products = async (req, res) => {
@@ -124,13 +126,15 @@ module.exports.deleteProduct = async (req, res) => {
 
 // Add Product
 module.exports.create = async (req, res) => {
+    const allRecords = await ProductCategory.find({ deleted: false });
+    const treeRecords = createTreeHelper.tree(allRecords);
     res.render('admin/pages/products/create', {
         title: "Create Product", // Title of the create product page
-    }) // Render create product page
+        records: treeRecords
+    })
 }
 
 module.exports.createPost = async (req, res) => {
-    
     req.body.price = parseInt(req.body.price);
     req.body.discountPercentage = parseInt(req.body.discountPercentage);
     req.body.stock = parseInt(req.body.stock);
@@ -156,10 +160,13 @@ module.exports.edit = async (req, res) => {
     _id: req.params.id
   };
   const product = await Product.findOne(find);
-  console.log(product.description);
+  const allRecords = await ProductCategory.find({ deleted: false });
+  const treeRecords = createTreeHelper.tree(allRecords);
+    
   res.render("admin/pages/products/edit", {
     pageTitle: "Trang sửa sản phẩm",
-    product: product
+    product: product,
+    records: treeRecords
   });
 }
 module.exports.editProduct = async (req, res) => {
@@ -173,9 +180,9 @@ module.exports.editProduct = async (req, res) => {
     req.body.position = req.body.position === "" ? 0 : parseInt(req.body.position);
 
     // Nếu người dùng upload ảnh mới
-    if (req.file) {
-      req.body.thumbnail = `/uploads/${req.file.filename}`;
-    }
+    // if (req.file) {
+    //   req.body.thumbnail = `/uploads/${req.file.filename}`;
+    // }
 
     // Cập nhật sản phẩm
     const updated = await Product.updateOne({_id: id}, req.body);

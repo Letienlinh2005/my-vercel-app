@@ -14,6 +14,7 @@ router.get('/', product_controller.products);
 router.patch('/change-status/:status/:id', product_controller.changeStatus);
 router.patch('/change-multi', product_controller.changeMulti);
 router.delete('/delete/:id', product_controller.deleteProduct);
+
 router.get('/create', product_controller.create);
 router.post('/create', upload.single('thumbnail'), uploadCloud.upload, validate.createPost, product_controller.createPost);
 

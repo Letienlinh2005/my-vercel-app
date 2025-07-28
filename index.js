@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const app = express();
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -29,6 +30,9 @@ app.use(bodyParser.urlencoded({extended:false}));
 app.use(cookieParser('LETIENLINHHEHE'));
 app.use(session({ cookie: { maxAge: 60000 }}));
 app.use(flash());
+
+// Tinymce
+app.use('/tinymce', express.static(path.join(__dirname, 'node_modules', 'tinymce')));
 
 // App local variables
 app.locals.prefixAdmin = systems.prefixAdmin;
