@@ -32,7 +32,7 @@ module.exports.edit = async (req, res) => {
     };
     const records = await Role.findOne(find);
     res.render('admin/pages/roles/edit', {
-        title: "Sửa nhóm quyền",
+        title: "Cập nhật nhóm quyền",
         records: records
     })
 }

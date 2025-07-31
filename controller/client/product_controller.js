@@ -1,4 +1,5 @@
 const Product = require('../../models/product_model.js');
+const systemConfig = require("../../config/systems");
 
 module.exports.index = async (req, res) => {
   console.log('Vào được controller index');

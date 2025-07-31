@@ -36,19 +36,19 @@ if (tablePermissions) {
                     permissions.push({
                         id: id,
                         permissions: []
-                    })
-                })
-            }else{
+                    });
+                });
+            } else {
                 inputs.forEach((input, index) => {
                     const checked = input.checked;
-                    if(checked){
+                    if (checked) {
+                        // Nếu mà được check thì permission[0](admin) mảng trong json sẽ đươc đẩy thêm tên của permision đó
                         permissions[index].permissions.push(name);
                     };
                 });
             };
         });
-        console.log(permissions);
-        if(permissions.length>0){
+        if (permissions.length > 0) {
             const formChangePermision = document.querySelector("#form-change-permissions");
             const inputPermission = formChangePermision.querySelector("input[name='permissions']");
             inputPermission.value = JSON.stringify(permissions);
@@ -58,17 +58,17 @@ if (tablePermissions) {
     });
 };
 
+// hiển thị tick 
 const dataRecords = document.querySelector("[data-records]");
-if(dataRecords){
+if (dataRecords) {
     const records = JSON.parse(dataRecords.getAttribute("data-records"));
     const tablePermissions = document.querySelector("[table-permissions]");
     records.forEach((record, index) => {
         const permissions = record.permissions;
-
         permissions.forEach(permission => {
             const row = tablePermissions.querySelector(`[data-name="${permission}"]`);
             const input = row.querySelectorAll("input")[index];
             input.checked = true;
         });
-    })
-}
+    });
+};

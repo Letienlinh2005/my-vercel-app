@@ -19,5 +19,4 @@ const roleSchema = new mongoose.Schema({
 });
 
 const role = mongoose.model("Role", roleSchema, "roles"); 
-// ← dùng "product" (tên collection trong DB)
-module.exports = role
+module.exports = role;

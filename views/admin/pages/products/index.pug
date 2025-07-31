@@ -65,7 +65,7 @@ block main
                                 input(type="checkbox" name="id" value=product.id)
                             td #{pagination.limitItems*(pagination.currentPage - 1) + (index+1)}
                             td= product.title
-                            td= product.product_category_id
+                            td= product.category.title
                             td 
                                 img(src=product.thumbnail, alt=product.title, class="img-fluid", height="80", width="80")
                             td!= product.description
