@@ -8,9 +8,9 @@ const createTree = (arr, parentId = "") => {
         const itemParentId = item.parent_id ? item.parent_id.toString() : "";
         if (itemParentId === parentId) {
             count++;
-            const newItem = {...item._doc}; // clone để tránh ghi đè Mongoose object
+            const newItem = {...item._doc};
             newItem.index = count;
-            newItem.id = item._id.toString(); // thêm id dạng chuỗi để tiện xử lý trong Pug
+            newItem.id = item._id.toString(); 
 
             const children = createTree(arr, item._id.toString());
             if (children.length > 0) {

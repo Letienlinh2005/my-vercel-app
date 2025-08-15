@@ -58,6 +58,7 @@ if(pagination) {
         });
     });
 }
+
 // Checkbox Multi
 const checkBoxMulti = document.querySelector("[checkbox-multi]");
 if(checkBoxMulti){

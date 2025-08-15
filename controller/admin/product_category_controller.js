@@ -1,4 +1,5 @@
 const ProductCategory = require("../../models/product_category_model");
+const Accounts = require("../../models/accounts_model");
 const systemConfig = require('../../config/systems');
 const createTreeHelper = require('../../helpers/createTree');
 
@@ -9,6 +10,21 @@ module.exports.index = async (req, res) => {
   const records = await ProductCategory.find(find);
   const newRecords = createTreeHelper.tree(records);
 
+  for(const record of records){
+    if(!record.createdBy || !record.createdBy.account_id){
+      record.createdBy.account_id = "";
+    }else{
+      const user = await Accounts.findOne({
+        _id: record.createdBy.account_id,
+        deleted: false,
+      });
+      if(user){
+        record.accountFullname = user.fullName;
+      }else{
+        record.accountFullname = "";
+      }
+    }
+  }
   res.render('admin/pages/products-category/index', {
     title: 'Category',
     records: newRecords
@@ -22,7 +38,7 @@ module.exports.create = async (req, res) => {
 
   const records = await ProductCategory.find(find);
   const newRecords = createTreeHelper.tree(records);
-
+  
   console.log(newRecords);
   res.render('admin/pages/products-category/create', {
     title: 'Create category',
@@ -37,8 +53,11 @@ module.exports.createPost = async (req, res) => {
   } else {
     req.body.position = parseInt(req.body.position);
   }
-  console.log(req.body);
   // Tạo mới 1 sản phẩm
+  req.body.createdBy = {
+    account_id: res.locals.user.id,
+  }
+  console.log(req.body);
   const productCategory = new ProductCategory(req.body);
   // Lưu sản phẩm vào db
   await productCategory.save();
@@ -67,8 +86,16 @@ module.exports.editCategory = async (req, res) => {
   try {
     const id = req.params.id;
     req.body.position = req.body.position === "" ? 0 : parseInt(req.body.position);
+
+    const updatedBy = {
+      account_id: res.locals.user.id,
+      updateAt: new Date(),
+    }
     // Cập nhật sản phẩm
-    const updated = await ProductCategory.updateOne({ _id: id }, req.body);
+    const updated = await ProductCategory.updateOne({ _id: id }, {
+      $set: req.body,
+      $push: {updatedBy: updatedBy}
+    });
 
     if (!updated) {
       req.flash('error', 'Không tìm thấy danh mục sản phẩm để cập nhật!');
@@ -85,10 +112,15 @@ module.exports.editCategory = async (req, res) => {
 
 module.exports.deleteCategory = async (req, res) => {
   const id = req.params.id;
+
+  const deletedBy = {
+    account_id: res.locals.user.id,
+    deleteAt: new Date()
+  }
   await ProductCategory.updateOne({ _id: id },
     {
       deleted: true,
-      deletedAt: new Date()
+      deletedBy: deletedBy
     });
   res.redirect(`${systemConfig.prefixAdmin}/products-category`);
 }

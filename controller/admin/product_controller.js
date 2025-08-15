@@ -1,6 +1,7 @@
 
 const Product = require('../../models/product_model.js');
 const ProductCategory = require('../../models/product_category_model.js');
+const Accounts = require('../../models/accounts_model.js');
 
 const systemConfig = require('../../config/systems.js');
 const filteredStatus = require('../../helpers/filterStatus.js');
@@ -10,6 +11,7 @@ const createTreeHelper = require('../../helpers/createTree');
 
 
 module.exports.products = async (req, res) => {
+  console.log(res.locals.user)
   try {
     console.log("Query parameters:", req.query); // In ra các tham số truy vấn
     const filter = filteredStatus(req.query); // Lọc trạng thái nếu có
@@ -49,18 +51,36 @@ module.exports.products = async (req, res) => {
       sort.position = "desc";
     }
 
+
     // End Sort
     const products = await Product.find(find).sort(sort).limit(objectPagination.limitItems).skip(objectPagination.skip); // Lấy sản phẩm với điều kiện tìm kiếm và phân trang
     for (const product of products) {
+      // Kiểm tra tồn tại createdBy và account_id trước khi truy cập
+      if (!product.createdBy.account_id) {
+        product.createdBy.account_id = "";
+      } else {
+        const user = await Accounts.findOne({
+          _id: product.createdBy.account_id,
+          deleted: false,
+        });
+        if (user) {
+          product.accountFullname = user.fullName;
+        } else {
+          product.accountFullname = "";
+        }
+      }
+    }
+
+    for (const product of products) {
       if (!product.product_category_id) {
         // Nếu null, undefined, hoặc chuỗi rỗng
-        product.category = "";
+        product.categoryTitle = "";
       } else {
         const category = await ProductCategory.findOne({
           _id: product.product_category_id,
           deleted: false,
         });
-        product.category = category;
+        product.categoryTitle = category.title;
       }
     }
 
@@ -69,7 +89,7 @@ module.exports.products = async (req, res) => {
       pageTitle: "Trang sản phẩm",
       title: "Trang danh sách sản phẩm",
       products: products,
-      filterStatus: filter, // Truyền dữ liệu trạng thái đã lọcx
+      filterStatus: filter, // Truyền dữ liệu trạng thái đã lọc
       keyword: objectSearch.keyword, // Truyền từ khóa tìm kiếm
       pagination: objectPagination
     });
@@ -126,16 +146,23 @@ module.exports.changeMulti = async (req, res) => {
   res.redirect(`${systemConfig.prefixAdmin}/products`);
 }
 
-//
+// Xoá sản phẩm
 module.exports.deleteProduct = async (req, res) => {
   const id = req.params.id;
-  await Product.updateOne({ _id: id },
+
+  await Product.updateOne(
+    { _id: id },
     {
       deleted: true,
-      deletedAt: new Date()
-    });
+      deletedBy: {
+        account_id: res.locals.user.id,
+        deletedAt: new Date()
+      }
+    }
+  );
+
   res.redirect(`${systemConfig.prefixAdmin}/products`);
-}
+};
 
 // Add Product
 module.exports.create = async (req, res) => {
@@ -151,6 +178,7 @@ module.exports.createPost = async (req, res) => {
   req.body.price = parseInt(req.body.price);
   req.body.discountPercentage = parseInt(req.body.discountPercentage);
   req.body.stock = parseInt(req.body.stock);
+
   if (req.body.position == "") {
     const countProducts = await Product.countDocuments();
     req.body.position = countProducts + 1;
@@ -159,6 +187,9 @@ module.exports.createPost = async (req, res) => {
   }
   // req.body.thumbnail = `/uploads/${req.file.filename}`;
   console.log(req.body);
+  req.body.createdBy = {
+    account_id: res.locals.user.id
+  };
   // Tạo mới 1 sản phẩm
   const product = new Product(req.body);
   // Lưu sản phẩm vào db
@@ -198,7 +229,15 @@ module.exports.editProduct = async (req, res) => {
     // }
 
     // Cập nhật sản phẩm
-    const updated = await Product.updateOne({ _id: id }, req.body);
+    const updated = await Product.updateOne({ _id: id }, {
+      $set: req.body,
+      $push: {
+        updatedBy: {
+          account_id: res.locals.user.id,
+          updatedAt: new Date()
+        }
+      }
+    });
 
     if (!updated) {
       req.flash('error', 'Không tìm thấy sản phẩm để cập nhật!');
@@ -229,4 +268,4 @@ module.exports.detail = async (req, res) => {
   catch (error) {
     res.redirect(`${systemConfig.prefixAdmin}/products`);
   }
-}
+};

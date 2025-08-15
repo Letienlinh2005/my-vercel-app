@@ -7,6 +7,6 @@ const validate = require("../../validates/admin/auth_validate");
 
 router.get("/login", auth_controller.login);
 router.post("/login", validate.loginPost, auth_controller.loginPost);
-
+router.get("/refresh-token", auth_controller.refreshToken);
 router.get("/logout", auth_controller.logout)
 module.exports = router;

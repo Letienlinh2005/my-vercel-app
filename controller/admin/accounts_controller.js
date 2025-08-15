@@ -1,7 +1,8 @@
 const Accounts = require('../../models/accounts_model');
 const Role = require('../../models/role');
 const systemConfig = require('../../config/systems');
-const md5 = require('md5');
+
+const bcrypt = require('bcrypt');
 module.exports.index = async (req, res) => {
     let find = {
         deleted: false,
@@ -15,6 +16,24 @@ module.exports.index = async (req, res) => {
         });
         record.role = role;
     };
+
+    for(const account of records){
+        if(!account.createdBy || !account.createdBy.account_id){
+            account.accountFullname = "";
+        }
+        else{
+            const user = await Accounts.findOne({
+                _id: account.createdBy.account_id,
+                deleted: false,
+
+            });
+            if(user){
+                account.accountFullname = user.fullName;
+            }else{
+                account.accountFullname = "";
+            }
+        }
+    }
     res.render("admin/pages/accounts/index", {
         title: "Đây là trang tài khoản",
         records: records,
@@ -38,11 +57,15 @@ module.exports.createPost = async (req, res) => {
     });
     if (emailExist) {
         req.flash("error", `Email ${req.body.email} đã tồn tại, vui lòng nhập email khác!`);
-        const referer = req.get('Referer'); // có thể là undefined
+        const referer = req.get('Referer'); 
 
         return res.redirect(referer);
     } else {
-        req.body.password = md5(req.body.password);
+        req.body.createdBy = {
+            account_id: res.locals.user.id,
+        }
+        const saltRound = 10;
+        req.body.password = await bcrypt.hash(req.body.password, saltRound);
         const accounts = new Accounts(req.body);
 
         await accounts.save();
@@ -72,13 +95,14 @@ module.exports.editPatch = async (req, res) => {
         _id: { $ne: id }, // tìm các email khác email của id hiện tại
         email: req.body.email,
         deleted: false,
-    })
+    });
     if (emailExist) {
         req.flash("error", `Email ${req.body.email} đã tồn tại.`)
     }
     else {
         if (req.body.password) {
-            req.body.password = md5(req.body.password);
+            const saltRound = 10;
+            req.body.password = await bcrypt.hash(req.body.password, saltRound);
         } else {
             delete req.body.password;
         }

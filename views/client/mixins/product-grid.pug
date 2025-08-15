@@ -1,0 +1,15 @@
+mixin product-grid(products)
+    .product-list
+        each product in products
+            .product-card
+                if product.thumbnail
+                    img.product-img(src=product.thumbnail, alt=product.title)
+                    if(product.feature == "featured")
+                        .inner.featured Nổi Bật
+                .product-info
+                    h3.product-title
+                        a(href=`/products/${product.slug}`) #{product.title}
+                    .product-pricing
+                        span.price-new #{product.newPrice}$
+                        span.price-old #{product.price}$
+                    .discount -#{product.discountPercentage}%

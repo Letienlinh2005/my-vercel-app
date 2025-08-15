@@ -40,9 +40,3 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
-
-// Xoá mềm
-
-// Sửa sản phẩm
-// Lấy dữ liệu để điền sẵn
-

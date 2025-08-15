@@ -1,16 +1,5 @@
 extends ../../layouts/default.pug
-
+include ../../mixins/product-grid.pug
 block main 
     h1 Đây là trang sản phẩm
-    .product-list
-        each product in products
-            .product-card
-                if product.thumbnail
-                    img.product-img(src=product.thumbnail, alt=product.title)
-                .product-info
-                    h3.product-title
-                        a(href=`/products/${product.slug}`) #{product.title}
-                    .product-pricing
-                        span.price-new #{product.newPrice}$
-                        span.price-old #{product.price}$
-                    .discount -#{product.discount}%
+    +product-grid(products)

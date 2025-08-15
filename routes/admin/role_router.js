@@ -1,18 +1,70 @@
 const express = require('express');
 const router = express.Router();
 const roles_controller = require('../../controller/admin/role_controller');
+const middlewares = require('../../middlewares/admin/auth_middleware');
 
+// LIST ROLES (xem)
+router.get(
+  '/',
+  middlewares.requireAuth,
+  middlewares.requirePermission ? middlewares.requirePermission('role_view') : (req, res, next) => next(),
+  roles_controller.index
+);
 
-router.get('/', roles_controller.index);
-router.get('/create', roles_controller.create);
-router.post('/create', roles_controller.createPost);
+// CREATE - form
+router.get(
+  '/create',
+  middlewares.requireAuth,
+  middlewares.requirePermission ? middlewares.requirePermission('role_create') : (req, res, next) => next(),
+  roles_controller.create
+);
 
-router.get('/edit/:id', roles_controller.edit);
-router.patch('/edit/:id', roles_controller.editRole);
+// CREATE - submit
+router.post(
+  '/create',
+  middlewares.requireAuth,
+  middlewares.requirePermission ? middlewares.requirePermission('role_create') : (req, res, next) => next(),
+  roles_controller.createPost
+);
 
-router.get('/permissions', roles_controller.permissions);
+// EDIT - form
+router.get(
+  '/edit/:id',
+  middlewares.requireAuth,
+  middlewares.requirePermission ? middlewares.requirePermission('role_edit') : (req, res, next) => next(),
+  roles_controller.edit
+);
 
-router.delete('/delete/:id', roles_controller.delete);
+// EDIT - submit
+router.patch(
+  '/edit/:id',
+  middlewares.requireAuth,
+  middlewares.requirePermission ? middlewares.requirePermission('role_edit') : (req, res, next) => next(),
+  roles_controller.editRole
+);
 
-router.patch('/permissions', roles_controller.permissionPatch)
+// PERMISSIONS UI (xem/manage permissions)
+router.get(
+  '/permissions',
+  middlewares.requireAuth,
+  middlewares.requirePermission ? middlewares.requirePermission('permission_view') : (req, res, next) => next(),
+  roles_controller.permissions
+);
+
+// UPDATE PERMISSIONS (submit)
+router.patch(
+  '/permissions',
+  middlewares.requireAuth,
+  middlewares.requirePermission ? middlewares.requirePermission('permission_edit') : (req, res, next) => next(),
+  roles_controller.permissionPatch
+);
+
+// DELETE ROLE
+router.delete(
+  '/delete/:id',
+  middlewares.requireAuth,
+  middlewares.requirePermission ? middlewares.requirePermission('role_delete') : (req, res, next) => next(),
+  roles_controller.delete
+);
+
 module.exports = router;

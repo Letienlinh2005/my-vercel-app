@@ -8,14 +8,60 @@ const validate = require("../../validates/admin/product_category_validate");
 const upload = multer();
 
 const product_category_controller = require('../../controller/admin/product_category_controller');
+const middlewares = require('../../middlewares/admin/auth_middleware');
 
-router.get('/', product_category_controller.index);
-router.get('/create', product_category_controller.create);
-router.post('/create', upload.single('thumbnail'), uploadCloud.upload, validate.createPost, product_category_controller.createPost);
+// LIST CATEGORIES (product_view)
+router.get(
+  '/',
+  middlewares.requireAuth,
+  middlewares.requirePermission ? middlewares.requirePermission('product_view') : (req, res, next) => next(),
+  product_category_controller.index
+);
 
+// CREATE - form (require permission product_create)
+router.get(
+  '/create',
+  middlewares.requireAuth,
+  middlewares.requirePermission ? middlewares.requirePermission('product_create') : (req, res, next) => next(),
+  product_category_controller.create
+);
 
-router.get('/edit/:id', product_category_controller.edit);
-router.patch('/edit/:id', upload.single('thumbnail'), uploadCloud.upload, validate.createPost, product_category_controller.editCategory);
+// CREATE - submit
+router.post(
+  '/create',
+  middlewares.requireAuth,
+  middlewares.requirePermission ? middlewares.requirePermission('product_create') : (req, res, next) => next(),
+  upload.single('thumbnail'),
+  uploadCloud.upload,
+  validate.createPost,
+  product_category_controller.createPost
+);
 
-router.delete('/delete/:id', product_category_controller.deleteCategory);
+// EDIT - form (product_edit)
+router.get(
+  '/edit/:id',
+  middlewares.requireAuth,
+  middlewares.requirePermission ? middlewares.requirePermission('product_edit') : (req, res, next) => next(),
+  product_category_controller.edit
+);
+
+// EDIT - submit
+router.patch(
+  '/edit/:id',
+  middlewares.requireAuth,
+  middlewares.requirePermission ? middlewares.requirePermission('product_edit') : (req, res, next) => next(),
+  upload.single('thumbnail'),
+  uploadCloud.upload,
+  validate.createPost,
+  product_category_controller.editCategory
+);
+
+// DELETE (product_delete)
+router.delete(
+  '/delete/:id',
+  middlewares.requireAuth,
+  middlewares.requirePermission ? middlewares.requirePermission('product_delete') : (req, res, next) => next(),
+  product_category_controller.deleteCategory
+);
+
 module.exports = router;
