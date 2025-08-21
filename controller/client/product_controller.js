@@ -1,7 +1,7 @@
 const Product = require('../../models/product_model.js');
 const ProductCategory = require('../../models/product_category_model.js');
 const systemConfig = require("../../config/systems");
-const newPriceHelpers = require('../../helpers/products');
+const productHelpers = require('../../helpers/products');
 const productCategoryHelpers = require('../../helpers/products_category.js');
 
 module.exports.index = async (req, res) => {
@@ -13,7 +13,7 @@ module.exports.index = async (req, res) => {
       deleted: false
     }).sort({ position: "desc" });
     // Tính giá mới
-    const newProduct = newPriceHelpers.newPriceProducts(products);
+    const newProduct = productHelpers.newPriceProducts(products);
     // Render view với dữ liệu sản phẩm
     res.render('client/pages/products/index', {
       pageTitle: "Trang sản phẩm",
@@ -37,10 +37,21 @@ module.exports.detail = async (req, res) => {
   try {
     const find = {
       deleted: false,
-      slug: req.params.slug
+      slug: req.params.slugProduct,
+      status: "active"
     }
     const product = await Product.findOne(find);
 
+    if(product.product_category_id){
+      const category = await ProductCategory.findOne({
+        _id: product.product_category_id,
+        status: "active",
+        deleted: false
+      });
+
+      product.category = category;
+    }
+    product.newPrice = productHelpers.newPriceProduct(product);
     res.render('client/pages/products/detail', {
       pageTitle: product.title,
       product: product
@@ -66,7 +77,7 @@ module.exports.category = async (req, res) => {
     deleted: false,
   }).sort({position: "desc"});
 
-  const newProduct = newPriceHelpers.newPriceProducts(products);
+  const newProduct = productHelpers.newPriceProducts(products);
 
   res.render('client/pages/products/index', {
       pageTitle: category.title,

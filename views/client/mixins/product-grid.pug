@@ -8,7 +8,7 @@ mixin product-grid(products)
                         .inner.featured Nổi Bật
                 .product-info
                     h3.product-title
-                        a(href=`/products/${product.slug}`) #{product.title}
+                        a(href=`/products/detail/${product.slug}`) #{product.title}
                     .product-pricing
                         span.price-new #{product.newPrice}$
                         span.price-old #{product.price}$

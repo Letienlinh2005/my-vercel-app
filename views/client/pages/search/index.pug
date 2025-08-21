@@ -1,0 +1,11 @@
+extends ../../layouts/default.pug
+include ../../mixins/product-grid.pug
+block main 
+    .container.my-3 
+        .row 
+            .col-12 
+                h1 Kết quả tìm kiếm
+        if(products && products.length > 0)
+            +product-grid(products)
+        else 
+            p Không có sản phẩm 

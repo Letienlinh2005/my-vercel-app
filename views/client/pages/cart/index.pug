@@ -1,0 +1,52 @@
+extends ../../layouts/default.pug
+include ../../mixins/alert.pug
+
+block main 
+    +alert-success(5000)
+    +alert-error(5000)
+
+    .container.my-3 
+        .row 
+            .col-12 
+                h2 Giỏ hàng 
+
+        .row 
+            .col-12 
+                table(class="table table-bordered")
+                    thead 
+                        tr 
+                            th STT 
+                            th Tên
+                            th Ảnh
+                            th Giá
+                            th Số lượng
+                            th Tổng tiền 
+                            th Hành động
+                    tbody
+                        if(cartDetail.products.length > 0)
+                            each item, index in cartDetail.products
+                                tr 
+                                    td #{index+1}
+
+                                    td 
+                                        a(href=`/products/detail/:id`) #{item.productInfo.title}
+                                    td
+                                        img(src=item.productInfo.thumbnail alt=item.productInfo.title width="80px") 
+
+                                    td #{item.productInfo.newPrice}$
+
+                                    td 
+                                        input(type="number" name="quantity" value=item.quantity min="1" product-id=item.product_id style="width: 60px")
+                                    
+                                    td #{item.productInfo.newPrice * item.quantity}$
+
+                                    td 
+                                        a(href='/cart/delete/:id' class="btn btn-danger") Xoá
+                        else
+                            p Không có sản phẩm nào trong giỏ hàng
+                        
+                            
+                h3(class="text-end") Tổng đơn hàng: #{cartDetail.cartTotal}$
+
+                div(class="text-end mt-3")
+                    a(href="/checkout" class="btn btn-success") THANH TOÁN

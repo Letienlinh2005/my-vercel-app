@@ -5,7 +5,8 @@ header.header
             .col-3 
                 a(href="/") 
                     img(src="https://cdn.daca.vn/media/logo/logo.svg", alt="Logo", class="img-fluid" height="150" width="150")
-            .col-9
+            
+            .col-4
                 ul 
                     li 
                         a(href="/") Trang chủ
@@ -13,4 +14,12 @@ header.header
                         -const pathProduct = "/products";
                         a(href=pathProduct) Sản phẩm
                         +sub-menu(layoutProductsCategory, pathProduct)
+                    li 
+                        a(href="/cart") Giỏ hàng(#{miniCart ? miniCart.totalQuantity : "0"})
+            
+            .col-4 
+                form(action="/search" method="GET")
+                    div(class="form-group d-flex mb-0")
+                        input(type="text" placeholder="Nhập từ khoá..." class="form-control" name="keyword" value=keyword)
+                        button(type="submit" class="btn btn-primary") Tìm
                 
